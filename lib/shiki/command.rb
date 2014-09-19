@@ -1,7 +1,7 @@
 require "thor"
 
-class Shiki::Command < Thor
-  
+class Shiki::Command < Thor::Group
+  include Thor::Actions
   argument :name
   def self.source_root
     File.dirname __FILE__
@@ -20,4 +20,3 @@ class Shiki::Command < Thor
   end
 
 end
-Shiki::Command.start

@@ -7,4 +7,9 @@ class Shiki::CLI < Thor
   def generate(*args)
     Shiki::Command.start args
   end
+
+  desc "generate files", "generate files"
+  def new(*args)
+    Shiki::Command.start args
+  end
 end

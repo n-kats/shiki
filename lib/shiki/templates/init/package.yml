@@ -1,0 +1,11 @@
+# texpages
+
+tex:
+  - amsmath
+  - amsthm
+  - amssymb
+  - amscd
+mathjax:
+  - xypic
+lib:
+  - sample-lib: >=0.0.1

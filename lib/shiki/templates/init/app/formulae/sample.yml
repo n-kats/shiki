@@ -1,0 +1,20 @@
+bb: 
+  - >
+    \mathbb{:x}
+  - x: 1
+# => \bb{R} -> \mathbb{R}
+
+R: \mathbb{R}
+
+Hoge: >
+  hogehoge
+
+bb2:
+  - >
+    \mathbb{:x} = flag ? :y : :int
+  - [ x , y , int ]
+  - x: 1
+    y:
+      Integer: 100
+
+

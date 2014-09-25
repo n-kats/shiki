@@ -1,0 +1,5 @@
+tex:
+  compiler:
+    platex
+  documenttype:
+    jsarticle

@@ -7,25 +7,24 @@ describe Shiki::Formula do
   after :each do
   end
 
-  it 'should parse' do
-    ar = Shiki::Formula.parse <<EOS
-hoge: >
-  HoGe:hige: :hoo
+  it 'should parse -- simple case' do
+    yml =<<EOS
+hoge: Hoge
 EOS
-    expect(ar).to eq false
+    expect{Shiki::Formula.parse yml}.not_to raise_error 
   end
 
-  it 'should parse -- array' do
-    ar = Shiki::Formula.parse <<EOS
+  it 'should parse -- complicated case' do
+    yml =<<EOS
 hoge:
   - >
-    {:hige} :hoo : :foo 
+    :hige :hoo : :foo 
   - [hige, hoo]
   - hige: T
     hoo: 3
 EOS
+    ar = Shiki::Formula.parse yml
     expect(ar.first.instance_variable_get(:@variables).length).to eq 3
-    expect(ar.first.variables.length).to eq 3
   end
 
   it 'should raise error : illegal order' do

@@ -1,7 +1,7 @@
 require 'yaml'
 
 class Shiki::Formula
-  VAR_REG = /(?:^|[^\\])(?:\\\\)*:([A-Za-z]+)/
+  VAR_REG = /(\\*):([A-Za-z]+)/
   class << self
     def parse(yml)
       YAML.load(yml).map do |key, val|
@@ -35,10 +35,12 @@ class Shiki::Formula
         else
           fail "unknown Format"
         end
+      rescue
+        fail [vars,order].to_s
       end
 
       def scan_variables(str)
-        str.scan(VAR_REG).map(&:first).uniq
+        str.scan(VAR_REG).select{|bs,|bs.to_s.length.even?}.map(&:last).uniq
       end
 
       def compatible_order?(vars, order)
@@ -46,10 +48,11 @@ class Shiki::Formula
       end
   end
 
+  attr_reader :variables
   def initialize(key, macro, vars, order, option)
     @key = key
     @variables = vars || []
-    @macro = macro
+    @macro = macro.chomp
     @order = order || []
     @option = option || {}
 
@@ -62,10 +65,50 @@ class Shiki::Formula
   end
 
   def to_tex_macro
-
+    "\\newcommand{\\#{@key}}[#{@variables.length}]{#{insipid_macro}}"
   end
 
+  def use(*arg)
+    if arg.last.is_a? Hash
+      add_option = arg.pop
+    end
+    vars = {}
+    add_option ||= {}
+    @variables.each do |var|
+      if add_option.key? var
+        vars[var] = add_option[var]
+      elsif add_option.key? var.to_sym
+        vars[var] = add_option[var.to_sym]
+      elsif @option.key? var
+        vars[var] = @option[var]
+      elsif @option.key? var.to_sym
+        vars[var] = @option[var.to_sym]
+      else
+        vars[var] = arg.shift
+      end
+    end
+    vars = vars.map{|k,v|v}
+    case vars.length
+    when 0
+      "\\#{@key}"
+    when 1
+      "\\#{@key}[#{vars.shift}]"
+    else
+      "\\#{@key}[#{vars.shift}]{#{vars.join('}{')}}"
+    end
+  end
   protected
+    def insipid_macro
+      mac = @macro.dup
+      vars_regs.each_with_index do |reg, i|
+        mac.gsub!(reg, "##{i+1}")
+      end
+      mac
+    end
+
+    def vars_regs
+      @variables.map{|var| /(?:^|[^\\])(?:\\\\)*:#{var}(?:[^A-Za-z]|$)/ }
+    end
   
 end
 
